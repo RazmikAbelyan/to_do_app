@@ -17,10 +17,9 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
-  TextEditingController  dateController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
   String? titleErrorText;
   String? dateErrorText;
-
 
   @override
   void dispose() {
@@ -31,15 +30,20 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AddTasksBloc, AddTasksState>(
-      listener: (context, state) => widget.onAdd?.call(Task(
-        title: state.title,
-        description: state.description,
-        endDate: state.endTime!,
-        isDone: false,
-        hide: false,
-      )),
+      listener: (context, state) {
+        widget.onAdd?.call(
+          Task(
+            title: state.title,
+            description: state.description,
+            endDate: state.endTime!,
+            isDone: false,
+            isHidden: false,
+          ),
+        );
+        Navigator.pop(context);
+      },
       listenWhen: (oldState, newState) => newState.added,
-      builder:(context, state) => Container(
+      builder: (context, state) => Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height - 100,
         padding: const EdgeInsets.all(15),
@@ -77,8 +81,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               const Divider(),
               TextFormField(
                 onChanged: (title) => context.read<AddTasksBloc>().add(TitleChanged(title)),
-                decoration:  InputDecoration(
-                  errorText: titleErrorText,
+                decoration: InputDecoration(
+                  errorText: state.isValid || state.title.isNotEmpty ? null : "Required",
                   focusColor: Colors.white,
                   fillColor: Colors.grey,
                   hintStyle: const TextStyle(
@@ -99,27 +103,23 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               const SizedBox(height: 15),
               TextFormField(
                 onChanged: (description) => context.read<AddTasksBloc>().add(DescriptionChanged(description)),
-
                 maxLines: 7,
                 decoration: InputDecoration(
                   focusColor: Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-
                   focusedBorder: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.blue, width: 1.0),
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   fillColor: Colors.grey,
-                  //make hint text
                   hintStyle: const TextStyle(
                     color: Colors.grey,
                     fontSize: 16,
                     fontFamily: "verdana_regular",
                     fontWeight: FontWeight.w400,
                   ),
-
                   labelText: 'Description',
                   labelStyle: const TextStyle(
                     color: Colors.grey,
@@ -131,30 +131,30 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               ),
               const SizedBox(height: 15),
               TextField(
-                  controller: dateController,
-                  decoration: InputDecoration(
-                    errorText: dateErrorText,
-                    prefixIcon: const Icon(Icons.calendar_today),
-                    labelText: "End date",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    hintText: 'Choose end date',
+                controller: dateController,
+                decoration: InputDecoration(
+                  errorText: state.isValid || state.endTime != null ? null : 'Required',
+                  prefixIcon: const Icon(Icons.calendar_today),
+                  labelText: "End date",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
-                  readOnly: true,
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-
-                        context: context,
-                        initialDate: DateTime.now(), //get today's date
-                        firstDate: DateTime(2000), //DateTime.now() - not to allow to choose before today.
-                        lastDate: DateTime(2101));
-                    if (pickedDate != null) {
-                      String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-                        dateController.text = formattedDate;
-                        context.read<AddTasksBloc>().add(DateChanged(pickedDate));
-                    }
-                  }),
+                  hintText: 'Choose end date',
+                ),
+                readOnly: true,
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(), //get today's date
+                      firstDate: DateTime(2000), //DateTime.now() - not to allow to choose before today.
+                      lastDate: DateTime(2101));
+                  if (pickedDate != null) {
+                    String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+                    dateController.text = formattedDate;
+                    context.read<AddTasksBloc>().add(DateChanged(pickedDate));
+                  }
+                },
+              ),
               const SizedBox(height: 15),
               SizedBox(
                 height: 40,
@@ -170,12 +170,14 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                           color: Colors.grey,
                         ),
                         child: const Center(
-                          child: Text('Cansel',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: "verdana_regular",
-                                fontWeight: FontWeight.w400,
-                              )),
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: "verdana_regular",
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
                         ),
                       ),
                       onTap: () {
@@ -193,26 +195,17 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                           color: Colors.green,
                         ),
                         child: const Center(
-                          child: Text('Add',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: "verdana_regular",
-                                fontWeight: FontWeight.w400,
-                              )),
+                          child: Text(
+                            'Add',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: "verdana_regular",
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
                         ),
                       ),
-                      onTap: () {
-                        if(state.title.isNotEmpty && state.endTime != null){
-                        context.read<AddTasksBloc>().add(TaskAdded());
-                        Navigator.pop(context);
-                         }else{
-                          setState(() {
-                            dateErrorText = state.endTime == null ? "Dan/'t be empty" : null;
-                            titleErrorText = state.title.isEmpty ? "Dan/'t be empty" : null;
-                          });
-
-                        }
-                      },
+                      onTap: () => context.read<AddTasksBloc>().add(TaskAdded()),
                     )
                   ],
                 ),
@@ -223,5 +216,4 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       ),
     );
   }
-
 }

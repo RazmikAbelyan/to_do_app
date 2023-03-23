@@ -46,9 +46,9 @@ class HomeTaskDone extends HomeEvent {
   });
 }
 class HomeTaskFiltered extends HomeEvent {
-  final String value;
+  final Filter filter;
 
   HomeTaskFiltered({
-    required this.value,
+    required this.filter,
   });
 }

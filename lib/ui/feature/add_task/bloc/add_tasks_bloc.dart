@@ -21,8 +21,13 @@ class AddTasksBloc extends Bloc<AddTasksEvent, AddTasksState> {
     on<DateChanged>((event, emit) {
       emit(state.copyWith(endTime: event.endDate));
     });
+
     on<TaskAdded>((event, emit) {
-      emit(state.copyWith(added: true));
+      if (state.title.isNotEmpty && state.endTime != null) {
+        emit(state.copyWith(added: true));
+      } else {
+        emit(state.copyWith(isValid: false));
+      }
     });
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:to_do_app/core/model/filter.dart';
 import 'package:to_do_app/ui/feature/home/bloc/home_bloc.dart';
 import 'package:to_do_app/ui/feature/home/view/home_screen.dart';
 
@@ -19,8 +20,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: BlocProvider<HomeBloc>(
-          create: (context) => HomeBloc(),
-          child: const MyHomePage(title: 'All Tasks')),
+        create: (context) => HomeBloc(),
+        child: const MyHomePage(title: 'All Tasks'),
+      ),
     );
   }
 }
@@ -40,37 +42,37 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        actions: [ PopupMenuButton(
-          onSelected: (value) {
-          context.read<HomeBloc>().add(HomeTaskFiltered(value: value));
-          },
-          itemBuilder: (BuildContext ctx) {
-            return [
-              const PopupMenuItem(
-                value: "completed",
-                child: Text(
-                  "Show only completed",
+        actions: [
+          PopupMenuButton(
+            onSelected: (value) {
+              context.read<HomeBloc>().add(HomeTaskFiltered(filter: value));
+            },
+            itemBuilder: (BuildContext ctx) {
+              return [
+                const PopupMenuItem(
+                  value: Filter.done,
+                  child: Text(
+                    "Show only completed",
+                  ),
                 ),
-              ),
-              const PopupMenuItem(
-                value: "not completed",
-                child: Text(
-                  "Show only not completed",
+                const PopupMenuItem(
+                  value: Filter.todo,
+                  child: Text(
+                    "Show only not completed",
+                  ),
                 ),
-              ),
-              const PopupMenuItem(
-                value: "",
-                child: Text(
-                  "Show all",
+                const PopupMenuItem(
+                  value: Filter.all,
+                  child: Text(
+                    "Show all",
+                  ),
                 ),
-              ),
-            ];
-          },
-        ),],
+              ];
+            },
+          ),
+        ],
       ),
       body: const HomeScreen(),
-
     );
   }
-
 }

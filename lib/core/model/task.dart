@@ -3,14 +3,14 @@ class Task {
   String description;
   bool isDone;
   DateTime endDate;
-  bool hide;
+  bool isHidden;
 
   Task({
     required this.title,
     required this.description,
     required this.endDate,
     required this.isDone,
-    required this.hide,
+    required this.isHidden,
   });
 
   Task copyWith({
@@ -18,14 +18,14 @@ class Task {
     String? description,
     DateTime? endDate,
     bool? isDone,
-    bool? hide,
+    bool? isHidden,
   }) {
     return Task(
       title: title ?? this.title,
       isDone: isDone ?? this.isDone,
       endDate: endDate ?? this.endDate,
       description: description ?? this.description,
-      hide: hide ?? this.hide,
+      isHidden: isHidden ?? this.isHidden,
     );
   }
 }

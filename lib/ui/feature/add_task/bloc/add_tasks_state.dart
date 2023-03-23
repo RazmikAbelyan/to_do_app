@@ -6,12 +6,14 @@ class AddTasksState {
   final String description;
   final DateTime? endTime;
   final bool added;
+  final bool isValid;
 
   const AddTasksState(
     this.title,
     this.description,
     this.endTime,
     this.added,
+    this.isValid,
   );
 
   const AddTasksState.initial({
@@ -19,6 +21,7 @@ class AddTasksState {
     this.description = '',
     this.endTime,
     this.added = false,
+    this.isValid = true,
   });
 
   AddTasksState copyWith({
@@ -26,12 +29,14 @@ class AddTasksState {
     String? description,
     DateTime? endTime,
     bool? added,
+    bool? isValid,
   }) {
     return AddTasksState(
       title ?? this.title,
       description ?? this.description,
       endTime ?? this.endTime,
       added ?? this.added,
+      isValid ?? this.isValid,
     );
   }
 }

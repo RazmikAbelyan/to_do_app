@@ -8,18 +8,8 @@ import 'package:to_do_app/ui/feature/edit_task/view/edit_task_screen.dart';
 import 'package:to_do_app/ui/feature/home/bloc/home_bloc.dart';
 import 'package:to_do_app/ui/feature/home/view/task_card.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,37 +18,33 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context, state) {
           return ListView.builder(
             itemCount: state.tasks.length + 1,
-            itemBuilder: (context, index) {
-              return index < state.tasks.length
-                  ? !state.tasks[index].hide?
-              GestureDetector(
-                      onTap: () => context.read<HomeBloc>().add(
-                        HomeTaskOpenDescription(
-                          index: state.showDescriptionIndex == index ? -1: index,
-                        ),
-                      ),
-                      child: TaskCard(
-                        showDescription: state.showDescriptionIndex == index,
-                        taskDone: (value) => context.read<HomeBloc>().add(
-                              HomeTaskDone(
-                                index: index,
-                                isDone: value,
+            itemBuilder: (context, index) => index < state.tasks.length
+                ? !state.tasks[index].isHidden
+                    ? GestureDetector(
+                        onTap: () => context.read<HomeBloc>().add(
+                              HomeTaskOpenDescription(index: state.showDescriptionIndex == index ? -1 : index),
+                            ),
+                        child: TaskCard(
+                          showDescription: state.showDescriptionIndex == index,
+                          taskDone: (value) => context.read<HomeBloc>().add(
+                                HomeTaskDone(
+                                  index: index,
+                                  isDone: value,
+                                ),
                               ),
-                            ),
-                        onDelete: () => context.read<HomeBloc>().add(
-                              HomeTaskDelete(index: index),
-                            ),
-                        onEdit: () {
-                          _editTask(context, state.tasks[index], index);
-                        },
-                        task: state.tasks[index],
-                      ),
-                    ): const SizedBox()
-                  : IconButton(
-                      onPressed: () => _addTask(context),
-                      icon: const Icon(Icons.add, size: 30),
-                    );
-            },
+                          onDelete: () => context.read<HomeBloc>().add(HomeTaskDelete(index: index)),
+                          onEdit: () => _editTask(context, state.tasks[index], index),
+                          task: state.tasks[index],
+                        ),
+                      )
+                    : const SizedBox()
+                : IconButton(
+                    onPressed: () => _addTask(context),
+                    icon: const Icon(
+                      Icons.add,
+                      size: 30,
+                    ),
+                  ),
           );
         },
       ),
@@ -75,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (BuildContext ctx) => BlocProvider<AddTasksBloc>(
           create: (context) => AddTasksBloc(),
           child: AddTaskScreen(
+            //Used callback because doesn't have Db to save
             onAdd: (task) => context.read<HomeBloc>().add(HomeTaskAdded(task: task)),
           ),
         ),
@@ -86,8 +73,12 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (BuildContext ctx) => BlocProvider<EditTaskBloc>(
           create: (context) => EditTaskBloc(task),
           child: EditTaskScreen(
+            //Used callback because doesn't have Db to save
             onEdit: (task) => context.read<HomeBloc>().add(
-                  HomeTaskEdited(task: task, index: index),
+                  HomeTaskEdited(
+                    task: task,
+                    index: index,
+                  ),
                 ),
           ),
         ),

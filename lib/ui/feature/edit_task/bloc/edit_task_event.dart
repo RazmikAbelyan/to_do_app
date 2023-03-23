@@ -16,9 +16,9 @@ class DescriptionEdited extends EditTaskEvent {
 }
 
 class DateEdited extends EditTaskEvent {
-  final  DateTime endDate;
+  final DateTime endDate;
 
   DateEdited(this.endDate);
 }
 
-class TaskEdited extends EditTaskEvent{}
+class TaskEdited extends EditTaskEvent {}

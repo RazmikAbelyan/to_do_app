@@ -16,8 +16,9 @@ class DescriptionChanged extends AddTasksEvent {
 }
 
 class DateChanged extends AddTasksEvent {
- final  DateTime endDate;
+  final DateTime endDate;
 
   DateChanged(this.endDate);
 }
-class TaskAdded extends AddTasksEvent{}
+
+class TaskAdded extends AddTasksEvent {}
